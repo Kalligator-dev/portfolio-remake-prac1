@@ -1,3 +1,5 @@
+import { animateTrack } from "./helpers.js";
+
 const track = document.getElementById("image-track");
 const counterEl = document.getElementById("counter");
 const totalEl = document.getElementById("total-count");
@@ -9,32 +11,6 @@ counterEl.innerText = currentImage;
 totalEl.innerText = total;
 
 let freeScroll = false;
-
-const animateTrack = (constrainedPrc, duration = 1200) => {
-  track.animate(
-    {
-      transform: `translate(${-constrainedPrc}%, -50%)`,
-    },
-    {
-      duration: duration,
-      fill: "forwards",
-      easing: "cubic-bezier(0.550, 0.085, 0.680, 0.530)",
-    }
-  );
-
-  for (const image of track.getElementsByClassName("img")) {
-    image.animate(
-      {
-        objectPosition: `${100 - constrainedPrc}% center`,
-      },
-      {
-        duration: duration,
-        fill: "forwards",
-        easing: "cubic-bezier(0.550, 0.085, 0.680, 0.530)",
-      }
-    );
-  }
-};
 
 if (!freeScroll) {
   track.style.opacity = 0;
@@ -51,10 +27,10 @@ if (!freeScroll) {
   );
 }
 
-window.onmousedown = (e) => {
+const handleMouseDown = (e) => {
   track.dataset.mouseDownAt = e.clientX;
 };
-window.onmouseup = () => {
+const handleMouseUp = () => {
   track.dataset.mouseDownAt = "0";
   track.dataset.prevPercentage = track.dataset.percentage;
   if (!freeScroll) {
@@ -63,8 +39,7 @@ window.onmouseup = () => {
     animateTrack(prc, 600);
   }
 };
-
-window.onmousemove = (e) => {
+const handleDrag = (e) => {
   if (track.dataset.mouseDownAt === "0") return;
   const mouseDelta = parseFloat(track.dataset.mouseDownAt) - e.clientX;
   const maxDelta = window.innerWidth / 2;
@@ -84,3 +59,13 @@ window.onmousemove = (e) => {
 
   animateTrack(constrainedPrc);
 };
+
+// mouse events
+window.onmousedown = (e) => handleMouseDown(e);
+window.onmouseup = (e) => handleMouseUp(e);
+window.onmousemove = (e) => handleDrag(e);
+
+// touch events
+window.ontouchstart = (e) => handleMouseDown(e.touches[0]);
+window.ontouchend = (e) => handleMouseUp(e.touches[0]);
+window.ontouchmove = (e) => handleDrag(e.touches[0]);
