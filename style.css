@@ -1,0 +1,34 @@
+body,
+html {
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  margin: 0;
+  overflow: hidden;
+}
+
+#image-track {
+  display: flex;
+  gap: 2vmin;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(0%, -50%);
+  user-select: none;
+}
+
+#image-track .img {
+  width: 25vmin;
+  height: 56vmin;
+  object-fit: cover;
+  object-position: 100% center;
+}
+
+#image-counter {
+  color: aliceblue;
+  font-size: larger;
+  position: absolute;
+  bottom: 10vmin;
+  left: 50%;
+  transform: translateX(-50%);
+}
