@@ -7,6 +7,11 @@ html {
   overflow: hidden;
 }
 
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
 #image-track {
   display: flex;
   gap: 2vmin;
@@ -18,8 +23,8 @@ html {
 }
 
 #image-track .img {
-  width: 25vmin;
-  height: 56vmin;
+  width: 54vmin;
+  height: 64vmin;
   object-fit: cover;
   object-position: 100% center;
 }
@@ -31,4 +36,11 @@ html {
   bottom: 10vmin;
   left: 50%;
   transform: translateX(-50%);
+  overflow: hidden;
+  height: 1.2rem;
+}
+
+#image-counter #counter {
+  display: inline-flex;
+  flex-direction: column;
 }
