@@ -20,7 +20,7 @@ if (!freeScroll) {
     {
       duration: 1200,
       fill: "forwards",
-      easing: "cubic-bezier(0.550, 0.085, 0.680, 0.530)",
+      easing: "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
     }
   );
 }
@@ -74,7 +74,7 @@ const handleMouseUp = () => {
 const handleDrag = (e) => {
   if (track.dataset.mouseDownAt === "0") return;
   const mouseDelta = parseFloat(track.dataset.mouseDownAt) - e.clientX;
-  const maxDelta = window.innerWidth / 2;
+  const maxDelta = window.innerWidth / 1.2;
   const prc = (mouseDelta / maxDelta) * 100;
   const prev = parseFloat(track.dataset.prevPercentage);
   const cur = prev + prc;

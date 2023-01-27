@@ -5,11 +5,36 @@ html {
   background-color: black;
   margin: 0;
   overflow: hidden;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
 }
 
 * {
   margin: 0;
   box-sizing: border-box;
+}
+
+#bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2880px;
+  height: 100%;
+  filter: grayscale(100%);
+}
+#bg .img {
+  opacity: 0.2;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+#bg #mask {
+  opacity: 0.8;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(0, -50%);
 }
 
 #image-track {
@@ -23,8 +48,8 @@ html {
 }
 
 #image-track .img {
-  width: 54vmin;
-  height: 64vmin;
+  width: 42vmin;
+  height: 52vmin;
   object-fit: cover;
   object-position: 100% center;
 }
@@ -33,7 +58,7 @@ html {
   color: aliceblue;
   font-size: larger;
   position: absolute;
-  bottom: 10vmin;
+  bottom: 5vmin;
   left: 50%;
   transform: translateX(-50%);
   overflow: hidden;

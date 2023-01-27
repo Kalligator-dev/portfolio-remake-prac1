@@ -1,11 +1,35 @@
+const bg = document.getElementById("bg");
+const maskImg = document.getElementById("mask");
 const track = document.getElementById("image-track");
 const counterEl = document.getElementById("counter");
+const extra = 1440 - window.innerWidth;
 
 export const animateTrack = (
   progress,
   duration = 1200,
   { easingProgress, easingParallax } = {}
 ) => {
+  bg.animate(
+    {
+      transform: `translate(${-Math.min(progress * 0.5, 50)}%, 0)`,
+      filter: `grayscale(${100 - progress}%)`,
+    },
+    {
+      duration: duration,
+      fill: "forwards",
+      easing: easingProgress || "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
+    }
+  );
+  maskImg.animate(
+    {
+      transform: `translate(${(-progress * extra) / 100}px, -50%)`,
+    },
+    {
+      duration: duration,
+      fill: "forwards",
+      easing: easingProgress || "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
+    }
+  );
   track.animate(
     {
       transform: `translate(${-progress}%, -50%)`,
@@ -13,7 +37,7 @@ export const animateTrack = (
     {
       duration: duration,
       fill: "forwards",
-      easing: easingProgress || "cubic-bezier(0.550, 0.085, 0.680, 0.530)",
+      easing: easingProgress || "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
     }
   );
 
@@ -25,13 +49,13 @@ export const animateTrack = (
       {
         duration: duration,
         fill: "forwards",
-        easing: easingParallax || "cubic-bezier(0.550, 0.085, 0.680, 0.530)",
+        easing: easingParallax || "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
       }
     );
   }
 };
 
-export const animateCounter = (progress, duration = 200, easingProgress) => {
+export const animateCounter = (progress, duration = 1000, easingProgress) => {
   counterEl.animate(
     {
       transform: `translate(0, ${-progress}%)`,
@@ -39,6 +63,7 @@ export const animateCounter = (progress, duration = 200, easingProgress) => {
     {
       duration: duration,
       fill: "forwards",
+      easing: "cubic-bezier(0, 0.2, 0, 0.95)",
     }
   );
 };
