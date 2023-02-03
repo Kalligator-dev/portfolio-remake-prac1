@@ -1,8 +1,10 @@
-import { animateTrack, animateCounter } from "./helpers.js";
+import { animateTrack, animateCounter, minimizeTrack } from "./helpers.js";
 
 const track = document.getElementById("image-track");
 const counterEl = document.getElementById("counter");
 const totalEl = document.getElementById("total-count");
+const fullscreenTrack = document.getElementById("fullscreen-track");
+let fullscreenEl = null;
 
 const total = track.childElementCount;
 const imgPrcFr = 50 / total;
@@ -99,3 +101,41 @@ window.onmousemove = (e) => handleDrag(e);
 window.ontouchstart = (e) => handleMouseDown(e.touches[0]);
 window.ontouchend = (e) => handleMouseUp(e.touches[0]);
 window.ontouchmove = (e) => handleDrag(e.touches[0]);
+
+const handleClick = (e) => {
+  fullscreenEl = e.target;
+  const elBox = fullscreenEl.getBoundingClientRect();
+  const clone = fullscreenEl.cloneNode(true);
+  fullscreenEl.style.opacity = 0;
+  fullscreenEl.style.transform = "translateY(50vh)";
+  const styles = getComputedStyle(fullscreenEl);
+
+  fullscreenTrack.appendChild(clone);
+  clone.style.width = styles.width;
+  clone.style.height = styles.height;
+  clone.classList.add("img");
+  clone.style.position = "absolute";
+  clone.style.left = elBox.left + "px";
+  clone.style.top = elBox.top + "px";
+  clone.style.objectPosition = styles.objectPosition;
+
+  clone.animate(
+    {
+      left: 0,
+      top: 0,
+      width: "100%",
+      height: (window.innerWidth * 853) / 1280 + "px",
+    },
+    {
+      duration: 1200,
+      fill: "forwards",
+      easing: "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
+    }
+  );
+  minimizeTrack(fullscreenEl);
+};
+
+const images = track.children;
+for (let i = 0; i < images.length; i++) {
+  images[i].addEventListener("click", handleClick);
+}

@@ -68,6 +68,49 @@ export const animateCounter = (progress, duration = 1000, easingProgress) => {
   );
 };
 
+export const minimizeTrack = (el, duration = 1200, easingProgress) => {
+  const { x } = getTranslateValues(track);
+  track.style.transformOrigin = "left top";
+  const trackWidth = +getComputedStyle(track).width.split("px")[0];
+  const factor = (window.innerWidth / 2 - 100) / (trackWidth * 1.75);
+  console.log(factor);
+
+  setTimeout(() => {
+    track.classList.add("mini");
+  }, duration / 2);
+
+  track.animate(
+    {
+      scale: factor,
+      top: "93.75%",
+      left: window.innerWidth * 0.5 + -x * factor + 75 + "px",
+    },
+    {
+      duration: duration,
+      fill: "forwards",
+      easing: easingProgress || "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
+    }
+  );
+
+  el.animate(
+    [
+      {
+        opacity: 0.25,
+      },
+      {
+        opacity: 1,
+        transform: "translateY(0)",
+      },
+    ],
+    {
+      delay: duration * 0.9,
+      duration: duration / 2,
+      fill: "forwards",
+      easing: "ease-out",
+    }
+  );
+};
+
 export function getTranslateValues(element) {
   const style = window.getComputedStyle(element);
   const matrix = style.transform || style.webkitTransform || style.mozTransform;
