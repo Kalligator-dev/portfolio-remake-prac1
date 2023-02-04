@@ -49,6 +49,7 @@ html {
 #image-track.mini {
   gap: 4vmin;
   transition: all 0.8s ease-in-out;
+  transition-delay: 0.4s;
 }
 
 #image-track .img {
@@ -59,7 +60,7 @@ html {
 }
 #image-track.mini .img {
   width: 70vmin;
-  transition: all 0.8s ease-in-out;
+  transition: all 1.8s ease-in-out;
 }
 
 #image-counter {

@@ -72,23 +72,19 @@ export const minimizeTrack = (el, duration = 1200, easingProgress) => {
   const { x } = getTranslateValues(track);
   track.style.transformOrigin = "left top";
   const trackWidth = +getComputedStyle(track).width.split("px")[0];
-  const factor = (window.innerWidth / 2 - 100) / (trackWidth * 1.75);
-  console.log(factor);
-
-  setTimeout(() => {
-    track.classList.add("mini");
-  }, duration / 2);
-
+  const factor = (window.innerWidth / 2 - 100) / (trackWidth * 1.681);
+  const left = window.innerWidth * 0.5 + -x * factor * 1.681 + 62.5 + "px";
+  track.classList.add("mini");
   track.animate(
     {
       scale: factor,
       top: "93.75%",
-      left: window.innerWidth * 0.5 + -x * factor + 75 + "px",
+      left,
     },
     {
       duration: duration,
       fill: "forwards",
-      easing: easingProgress || "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
+      easing: easingProgress || "ease",
     }
   );
 
@@ -106,7 +102,7 @@ export const minimizeTrack = (el, duration = 1200, easingProgress) => {
       delay: duration * 0.9,
       duration: duration / 2,
       fill: "forwards",
-      easing: "ease-out",
+      easing: "ease",
     }
   );
 };

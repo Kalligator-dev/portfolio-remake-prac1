@@ -59,9 +59,11 @@ function updateValue() {
 }
 
 const handleMouseDown = (e) => {
-  track.dataset.mouseDownAt = e.clientX;
-  animationDone = false;
-  requestAnimationFrame(updateValue);
+  if (!fullscreenEl) {
+    track.dataset.mouseDownAt = e.clientX;
+    animationDone = false;
+    requestAnimationFrame(updateValue);
+  }
 };
 const handleMouseUp = () => {
   track.dataset.mouseDownAt = "0";
@@ -107,7 +109,7 @@ const handleClick = (e) => {
   const elBox = fullscreenEl.getBoundingClientRect();
   const clone = fullscreenEl.cloneNode(true);
   fullscreenEl.style.opacity = 0;
-  fullscreenEl.style.transform = "translateY(50vh)";
+  fullscreenEl.style.transform = "translateY(55vh)";
   const styles = getComputedStyle(fullscreenEl);
 
   fullscreenTrack.appendChild(clone);
@@ -129,7 +131,7 @@ const handleClick = (e) => {
     {
       duration: 1200,
       fill: "forwards",
-      easing: "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
+      easing: "cubic-bezier(0,0.6,0.5,1)",
     }
   );
   minimizeTrack(fullscreenEl);
