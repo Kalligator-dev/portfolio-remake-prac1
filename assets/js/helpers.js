@@ -70,7 +70,7 @@ export const animateCounter = (progress, duration = 1000, easingProgress) => {
 
 export const minimizeTrack = (el, duration = 1200, easingProgress) => {
   const anims = track.getAnimations();
-  anims.forEach((anim) => anim.cancel());
+  anims.forEach((anim) => anim.pause());
   const { x } = getTranslateValues(track);
   track.style.transformOrigin = "left top";
   const trackWidth = +getComputedStyle(track).width.split("px")[0];
