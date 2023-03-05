@@ -126,7 +126,7 @@ const handleClick = (e) => {
       left: 0,
       top: 0,
       width: "100%",
-      height: (window.innerWidth * 853) / 1280 + "px",
+      height: "100%",
     },
     {
       duration: 1200,
