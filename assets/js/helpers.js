@@ -2,7 +2,23 @@ const bg = document.getElementById("bg");
 const maskImg = document.getElementById("mask");
 const track = document.getElementById("image-track");
 const counterEl = document.getElementById("counter");
-const extra = 1440 - window.innerWidth;
+let extra = 1440 - window.innerWidth;
+
+window.addEventListener("resize", () => {
+  extra = 1440 - window.innerWidth;
+  maskImg.animate(
+    {
+      transform: `translate(${
+        (-track.dataset.percentage * extra) / 100
+      }px, -50%)`,
+    },
+    {
+      duration: 50,
+      fill: "forwards",
+      easing: "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
+    }
+  );
+});
 
 export const animateTrack = (
   progress,
