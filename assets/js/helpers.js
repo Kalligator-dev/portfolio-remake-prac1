@@ -1,8 +1,16 @@
+import { curIndex, fullscreenEl, fullscreenObject } from "./app.js";
+
 const bg = document.getElementById("bg");
 const maskImg = document.getElementById("mask");
 const track = document.getElementById("image-track");
 const counterEl = document.getElementById("counter");
+const trackStyle = { x: 0, width: 0 };
 const extra = 1440 - window.innerWidth;
+
+window.addEventListener("resize", () => {
+  if (!fullscreenEl) return;
+  minimizeTrack(fullscreenEl, 1200, true);
+});
 
 export const animateTrack = (
   progress,
@@ -55,7 +63,7 @@ export const animateTrack = (
   }
 };
 
-export const animateCounter = (progress, duration = 1000, easingProgress) => {
+export const animateCounter = (progress, duration = 1000) => {
   counterEl.animate(
     {
       transform: `translate(0, ${-progress}%)`,
@@ -68,28 +76,29 @@ export const animateCounter = (progress, duration = 1000, easingProgress) => {
   );
 };
 
-export const minimizeTrack = (el, duration = 1200, easingProgress) => {
+export const resizeTrack = () => {};
+
+export const minimizeTrack = (el, duration = 1200, resize) => {
+  track.classList.remove("resize");
   const anims = track.getAnimations();
   anims.forEach((anim) => anim.pause());
   const { x } = getTranslateValues(track);
+  trackStyle.x = x;
   track.style.transformOrigin = "left top";
+  const vmin = Math.min(window.innerHeight, window.innerWidth) / 100;
+  const trackWdth = Math.floor(vmin * 20 + vmin * 42 * 11);
   const trackWidth = +getComputedStyle(track).width.split("px")[0];
-  const factor = (window.innerWidth / 2 - 100) / (trackWidth * 1.681);
+  const factor = (window.innerWidth / 2 - 100) / (trackWdth * 1.681);
+  const factorSm = (window.innerWidth - 100) / (trackWdth * 1.681);
   const left = window.innerWidth * 0.5 + -x * factor * 1.681 + 62.5 + "px";
+  const leftSm = 50 + -x * factorSm * 1.681 + "px";
+  document.documentElement.style.setProperty("--track-scale", factor);
+  document.documentElement.style.setProperty("--track-scale-sm", factorSm);
+  document.documentElement.style.setProperty("--track-left", left);
+  document.documentElement.style.setProperty("--track-left-sm", leftSm);
   track.classList.add("mini");
-  track.animate(
-    {
-      scale: factor,
-      top: "93.75%",
-      left,
-    },
-    {
-      duration: duration,
-      fill: "forwards",
-      easing: easingProgress || "ease",
-    }
-  );
-
+  track.classList.add("resize");
+  if (resize) return;
   el.animate(
     [
       {

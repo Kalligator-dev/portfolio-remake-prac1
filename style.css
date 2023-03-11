@@ -46,10 +46,17 @@ html {
   transform: translate(0%, -50%);
   user-select: none;
 }
+#image-track.animate {
+  transition: all 1.5s ease;
+}
 #image-track.mini {
+  transition: all 1.2s ease;
+  top: 93.75%;
   gap: 4vmin;
-  transition: all 0.8s ease-in-out;
-  transition-delay: 0.4s;
+}
+#image-track.mini.resize {
+  scale: var(--track-scale);
+  left: var(--track-left);
 }
 
 #image-track .img {
@@ -93,4 +100,15 @@ html {
 
 #fullscreen-track .img {
   object-fit: cover;
+}
+
+@media (max-width: 760px) {
+  #image-counter {
+    display: none;
+  }
+
+  #image-track.mini.resize {
+    scale: var(--track-scale-sm);
+    left: var(--track-left-sm);
+  }
 }
