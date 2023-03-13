@@ -1,9 +1,4 @@
-import {
-  animateTrack,
-  animateCounter,
-  minimizeTrack,
-  getTranslateValues,
-} from "./helpers.js";
+import { animateTrack, animateCounter, minimizeTrack } from "./helpers.js";
 
 // export class project {
 //   constructor(){
@@ -22,7 +17,6 @@ export const fullscreenObject = {
   el: null,
   index: 0,
 };
-
 export const total = track.childElementCount;
 export const imgPrcFr = 50 / total;
 let currentImage = 1;
@@ -54,6 +48,7 @@ for (let i = 0; i < total; i++) {
 let currentPrc,
   rep = 0;
 let animationDone;
+let startLink;
 const trackWidth = track.offsetWidth;
 function updateValue() {
   if (!fullscreenEl) {
@@ -76,7 +71,7 @@ function updateValue() {
   } else {
     animateCounter((Math.min(curIndex, total - 1) * 100) / total);
     if (fullscreenObject.exit) {
-      linkPosition();
+      linkPosition(900);
     }
   }
   requestAnimationFrame(updateValue);
@@ -85,7 +80,11 @@ function updateValue() {
 const handleMouseDown = (e) => {
   track.dataset.mouseDownAt = e.clientX;
   animationDone = false;
-  if (fullscreenEl && !fullscreenObject.minimizeFullscreenEl) {
+  if (
+    fullscreenEl &&
+    !fullscreenObject.minimizeFullscreenEl &&
+    !fullscreenObject.exit
+  ) {
     fullscreenObject.minimizeFullscreenEl = true;
   }
   requestAnimationFrame(updateValue);
@@ -130,6 +129,7 @@ const handleDrag = (e) => {
             fullscreenObject.el = null;
             fullscreenObject.fullscreen = false;
           }
+          exitTimer = null;
         }, 20);
       }, duration * 1.5);
   }
@@ -171,8 +171,18 @@ const enterFullScreen = (fullscreenEl) => {
   }
   const elBox = fullscreenEl.getBoundingClientRect();
   const clone = fullscreenEl.cloneNode(true);
-  fullscreenEl.style.opacity = 0;
-  fullscreenEl.style.transform = "translateY(55vh)";
+  fullscreenEl.animate(
+    [
+      {
+        opacity: 1,
+      },
+      {
+        opacity: 0,
+        transform: "translateY(55vh)",
+      },
+    ],
+    { duration: 1, fill: "forwards" }
+  );
   const styles = getComputedStyle(fullscreenEl);
 
   fullscreenTrack.appendChild(clone);
@@ -207,18 +217,16 @@ const exitFullScreen = (duration = 600) => {
   const fullscreenEl = images[fullscreenObject.index];
   const elBox = fullscreenEl.getBoundingClientRect();
   const clone = fullscreenEl.cloneNode(true);
-  document.body.appendChild(clone);
   const styles = getComputedStyle(fullscreenEl);
+  clone.classList.add("img");
   clone.style.width = elBox.width + "px";
   clone.style.height = elBox.height + "px";
-  clone.classList.add("img");
   clone.style.position = "absolute";
   clone.style.left = elBox.left + "px";
   clone.style.top = elBox.top + "px";
   clone.style.objectPosition = styles.objectPosition;
   clone.style.zIndex = "999";
-  clone.style.opacity = "1";
-  clone.style.transform = "translateY(0)";
+  document.body.appendChild(clone);
   fullscreenEl.animate(
     [
       {
@@ -258,6 +266,7 @@ const exitFullScreen = (duration = 600) => {
 
 let logged = false;
 const minimizeFullscreenEl = (duration, easing) => {
+  startLink = Date.now();
   const clone = fullscreenObject.el;
   const vmin = Math.min(window.innerHeight, window.innerWidth) / 100;
   clone.animate(
@@ -288,21 +297,24 @@ const minimizeFullscreenEl = (duration, easing) => {
         fill: "forwards",
       }
     );
-    setTimeout(() => {
-      fullscreenEl = null;
-      if (fullscreenObject.el) {
-        fullscreenObject.el.remove();
-        fullscreenObject.el = null;
-      }
-    }, 500);
+    // setTimeout(() => {
+    //   fullscreenEl = null;
+    //   if (fullscreenObject.el) {
+    //     fullscreenObject.el.remove();
+    //     fullscreenObject.el = null;
+    //   }
+    // }, 500);
   }, duration * 2.5);
 };
-const linkPosition = () => {
+const linkPosition = (duration = 600, easing) => {
   const clone = fullscreenObject.el;
   const elBox = fullscreenEl.getBoundingClientRect();
   const elBox1 = clone.getBoundingClientRect();
+  // const centerDiff = (elBox1.width - elBox.width) / 2;
+  const centerDiff = 0;
   const styles = getComputedStyle(fullscreenEl);
   const styles1 = getComputedStyle(clone);
+  const animationTime = Math.max(5, duration + startLink - Date.now());
 
   clone.animate(
     [
@@ -311,14 +323,14 @@ const linkPosition = () => {
         objectPosition: styles1.objectPosition,
       },
       {
-        left: elBox.left + "px",
+        left: elBox.left - centerDiff + "px",
         objectPosition: styles.objectPosition,
       },
     ],
     {
-      duration: 5,
+      duration: animationTime,
       fill: "forwards",
-      easing: "cubic-bezier(0,0.4,0.5,1)",
+      easing: easing || "cubic-bezier(0,0.6,0.5,1)",
     }
   );
   // fullscreenTrack.removeChild(clone);
@@ -326,6 +338,7 @@ const linkPosition = () => {
 };
 
 const handleClick = (e) => {
+  if (fullscreenObject.exit || fullscreenObject.el || exitTimer) return;
   fullscreenEl = e.target;
   enterFullScreen(fullscreenEl);
   minimizeTrack(fullscreenEl);
