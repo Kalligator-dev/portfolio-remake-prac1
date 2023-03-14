@@ -1,11 +1,5 @@
 import { animateTrack, animateCounter, minimizeTrack } from "./helpers.js";
 
-// export class project {
-//   constructor(){
-//     this.track =
-//   }
-// }
-
 export const track = document.getElementById("image-track");
 export const counterEl = document.getElementById("counter");
 export const totalEl = document.getElementById("total-count");
@@ -264,7 +258,6 @@ const exitFullScreen = (duration = 600) => {
   }, duration);
 };
 
-let logged = false;
 const minimizeFullscreenEl = (duration, easing) => {
   startLink = Date.now();
   const clone = fullscreenObject.el;
@@ -297,21 +290,15 @@ const minimizeFullscreenEl = (duration, easing) => {
         fill: "forwards",
       }
     );
-    // setTimeout(() => {
-    //   fullscreenEl = null;
-    //   if (fullscreenObject.el) {
-    //     fullscreenObject.el.remove();
-    //     fullscreenObject.el = null;
-    //   }
-    // }, 500);
   }, duration * 2.5);
 };
 const linkPosition = (duration = 600, easing) => {
   const clone = fullscreenObject.el;
   const elBox = fullscreenEl.getBoundingClientRect();
   const elBox1 = clone.getBoundingClientRect();
-  // const centerDiff = (elBox1.width - elBox.width) / 2;
-  const centerDiff = 0;
+  const midScreen = window.innerWidth / 2;
+  let centerDiff = (elBox1.width - elBox.width) / 2;
+  if (midScreen > elBox.left) centerDiff = 0;
   const styles = getComputedStyle(fullscreenEl);
   const styles1 = getComputedStyle(clone);
   const animationTime = Math.max(5, duration + startLink - Date.now());
@@ -333,8 +320,6 @@ const linkPosition = (duration = 600, easing) => {
       easing: easing || "cubic-bezier(0,0.6,0.5,1)",
     }
   );
-  // fullscreenTrack.removeChild(clone);
-  // fullscreenObject.el = null;
 };
 
 const handleClick = (e) => {
