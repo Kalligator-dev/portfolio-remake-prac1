@@ -1,11 +1,18 @@
-import { animateTrack, animateCounter } from "./helpers.js";
+import { animateTrack, animateCounter, minimizeTrack } from "./helpers.js";
 
-const track = document.getElementById("image-track");
-const counterEl = document.getElementById("counter");
-const totalEl = document.getElementById("total-count");
-
-const total = track.childElementCount;
-const imgPrcFr = 50 / total;
+export const track = document.getElementById("image-track");
+export const counterEl = document.getElementById("counter");
+export const totalEl = document.getElementById("total-count");
+export const fullscreenTrack = document.getElementById("fullscreen-track");
+export let fullscreenEl = null;
+export let curIndex = 0;
+export const fullscreenObject = {
+  fullscreen: false,
+  el: null,
+  index: 0,
+};
+export const total = track.childElementCount;
+export const imgPrcFr = 50 / total;
 let currentImage = 1;
 totalEl.innerText = total;
 
@@ -35,30 +42,45 @@ for (let i = 0; i < total; i++) {
 let currentPrc,
   rep = 0;
 let animationDone;
+let startLink;
 const trackWidth = track.offsetWidth;
 function updateValue() {
-  const style = window.getComputedStyle(track);
-  const matrix = new WebKitCSSMatrix(style.transform);
-  const currentTransform = -(matrix.m41 * 100) / trackWidth;
-  const curIndex = Math.floor((currentTransform * total) / 100);
-  if (currentImage !== curIndex + 1) {
-    currentImage = curIndex + 1;
-    animateCounter((Math.min(curIndex, total - 1) * 100) / total);
-  }
+  if (!fullscreenEl) {
+    const style = window.getComputedStyle(track);
+    const matrix = new WebKitCSSMatrix(style.transform);
+    const currentTransform = -(matrix.m41 * 100) / trackWidth;
+    const curIndex = Math.floor((currentTransform * total) / 100);
+    if (currentImage !== curIndex + 1) {
+      currentImage = curIndex + 1;
+      animateCounter((Math.min(curIndex, total - 1) * 100) / total);
+    }
 
-  if (currentPrc == currentTransform && animationDone) {
-    rep++;
+    if (currentPrc == currentTransform && animationDone) {
+      rep++;
+    } else {
+      rep = 0;
+      currentPrc = currentTransform;
+    }
+    if (rep > 10) return;
   } else {
-    rep = 0;
-    currentPrc = currentTransform;
+    animateCounter((Math.min(curIndex, total - 1) * 100) / total);
+    if (fullscreenObject.exit) {
+      linkPosition(900);
+    }
   }
-  if (rep > 10) return;
   requestAnimationFrame(updateValue);
 }
 
 const handleMouseDown = (e) => {
   track.dataset.mouseDownAt = e.clientX;
   animationDone = false;
+  if (
+    fullscreenEl &&
+    !fullscreenObject.minimizeFullscreenEl &&
+    !fullscreenObject.exit
+  ) {
+    fullscreenObject.minimizeFullscreenEl = true;
+  }
   requestAnimationFrame(updateValue);
 };
 const handleMouseUp = () => {
@@ -71,8 +93,40 @@ const handleMouseUp = () => {
   }
   animationDone = true;
 };
+
+let exitTimer;
 const handleDrag = (e) => {
   if (track.dataset.mouseDownAt === "0") return;
+  if (fullscreenEl) {
+    const duration = 1200;
+    if (fullscreenObject.minimizeFullscreenEl) {
+      fullscreenObject.minimizeFullscreenEl = false;
+      minimizeFullscreenEl(duration / 2);
+    }
+    fullscreenObject.exit = true;
+    exitFullScreen(duration / 2);
+    track.classList.add("animate");
+    track.classList.remove("resize");
+    track.classList.remove("mini");
+    if (!exitTimer)
+      exitTimer = setTimeout(() => {
+        images[fullscreenObject.index].animate(
+          [{ opacity: 0 }, { opacity: 1 }],
+          { duration: 10, fill: "forwards" }
+        );
+        setTimeout(() => {
+          fullscreenEl = null;
+          track.classList.remove("animate");
+          fullscreenObject.exit = false;
+          if (fullscreenObject.el) {
+            fullscreenObject.el.remove();
+            fullscreenObject.el = null;
+            fullscreenObject.fullscreen = false;
+          }
+          exitTimer = null;
+        }, 20);
+      }, duration * 1.5);
+  }
   const mouseDelta = parseFloat(track.dataset.mouseDownAt) - e.clientX;
   const maxDelta = window.innerWidth / 1.2;
   const prc = (mouseDelta / maxDelta) * 100;
@@ -99,3 +153,184 @@ window.onmousemove = (e) => handleDrag(e);
 window.ontouchstart = (e) => handleMouseDown(e.touches[0]);
 window.ontouchend = (e) => handleMouseUp(e.touches[0]);
 window.ontouchmove = (e) => handleDrag(e.touches[0]);
+
+const enterFullScreen = (fullscreenEl) => {
+  fullscreenObject.fullscreen = true;
+  const images = track.children;
+  for (let i = 0; i < images.length; i++) {
+    if (images[i] === fullscreenEl) {
+      curIndex = i;
+      fullscreenObject.index = i;
+    }
+  }
+  const elBox = fullscreenEl.getBoundingClientRect();
+  const clone = fullscreenEl.cloneNode(true);
+  fullscreenEl.animate(
+    [
+      {
+        opacity: 1,
+      },
+      {
+        opacity: 0,
+        transform: "translateY(55vh)",
+      },
+    ],
+    { duration: 1, fill: "forwards" }
+  );
+  const styles = getComputedStyle(fullscreenEl);
+
+  fullscreenTrack.appendChild(clone);
+  fullscreenObject.el = clone;
+  clone.style.width = styles.width;
+  clone.style.height = styles.height;
+  clone.classList.add("img");
+  clone.style.position = "absolute";
+  clone.style.left = elBox.left + "px";
+  clone.style.top = elBox.top + "px";
+  clone.style.objectPosition = styles.objectPosition;
+
+  clone.animate(
+    {
+      left: 0,
+      top: 0,
+      width: "100%",
+      height: "100%",
+    },
+    {
+      duration: 1200,
+      fill: "forwards",
+      easing: "cubic-bezier(0,0.6,0.5,1)",
+    }
+  );
+};
+
+const exitFullScreen = (duration = 600) => {
+  if (!fullscreenObject.fullscreen) return;
+  fullscreenObject.fullscreen = false;
+  const images = track.children;
+  const fullscreenEl = images[fullscreenObject.index];
+  const elBox = fullscreenEl.getBoundingClientRect();
+  const clone = fullscreenEl.cloneNode(true);
+  const styles = getComputedStyle(fullscreenEl);
+  clone.classList.add("img");
+  clone.style.width = elBox.width + "px";
+  clone.style.height = elBox.height + "px";
+  clone.style.position = "absolute";
+  clone.style.left = elBox.left + "px";
+  clone.style.top = elBox.top + "px";
+  clone.style.objectPosition = styles.objectPosition;
+  clone.style.zIndex = "999";
+  document.body.appendChild(clone);
+  fullscreenEl.animate(
+    [
+      {
+        opacity: 1,
+      },
+      {
+        opacity: 0,
+      },
+    ],
+    {
+      duration: 10,
+      fill: "forwards",
+    }
+  );
+
+  clone.animate(
+    [
+      {
+        opacity: 1,
+      },
+      {
+        opacity: 0.25,
+        top: "120%",
+      },
+    ],
+    {
+      duration: duration,
+      fill: "forwards",
+      easing: "ease",
+    }
+  );
+
+  setTimeout(() => {
+    clone.remove();
+  }, duration);
+};
+
+const minimizeFullscreenEl = (duration, easing) => {
+  startLink = Date.now();
+  const clone = fullscreenObject.el;
+  const vmin = Math.min(window.innerHeight, window.innerWidth) / 100;
+  clone.animate(
+    [
+      {
+        width: "100%",
+        height: "100%",
+        top: 0,
+      },
+      {
+        width: 42 * vmin + "px",
+        height: 52 * vmin + "px",
+        top: "50%",
+        transform: "translateY(-50%)",
+      },
+    ],
+    {
+      duration: duration,
+      fill: "forwards",
+      easing: easing || "cubic-bezier(0,0.4,0.5,1)",
+    }
+  );
+  setTimeout(() => {
+    images[fullscreenObject.index].animate(
+      [{ opacity: 0.95 }, { opacity: 1 }],
+      {
+        duration: 5,
+        fill: "forwards",
+      }
+    );
+  }, duration * 2.5);
+};
+const linkPosition = (duration = 600, easing) => {
+  const clone = fullscreenObject.el;
+  const elBox = fullscreenEl.getBoundingClientRect();
+  const elBox1 = clone.getBoundingClientRect();
+  const midScreen = window.innerWidth / 2;
+  let centerDiff = (elBox1.width - elBox.width) / 2;
+  if (midScreen > elBox.left) centerDiff = 0;
+  const styles = getComputedStyle(fullscreenEl);
+  const styles1 = getComputedStyle(clone);
+  const animationTime = Math.max(5, duration + startLink - Date.now());
+
+  clone.animate(
+    [
+      {
+        left: elBox1.left + "px",
+        objectPosition: styles1.objectPosition,
+      },
+      {
+        left: elBox.left - centerDiff + "px",
+        objectPosition: styles.objectPosition,
+      },
+    ],
+    {
+      duration: animationTime,
+      fill: "forwards",
+      easing: easing || "cubic-bezier(0,0.6,0.5,1)",
+    }
+  );
+};
+
+const handleClick = (e) => {
+  if (fullscreenObject.exit || fullscreenObject.el || exitTimer) return;
+  fullscreenEl = e.target;
+  enterFullScreen(fullscreenEl);
+  minimizeTrack(fullscreenEl);
+  animateCounter((Math.min(curIndex, total - 1) * 100) / total);
+};
+
+const images = track.children;
+for (let i = 0; i < images.length; i++) {
+  images[i].addEventListener("click", handleClick);
+}

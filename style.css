@@ -46,6 +46,18 @@ html {
   transform: translate(0%, -50%);
   user-select: none;
 }
+#image-track.animate {
+  transition: all 1.5s ease;
+}
+#image-track.mini {
+  transition: all 1.2s ease;
+  top: 93.75%;
+  gap: 4vmin;
+}
+#image-track.mini.resize {
+  scale: var(--track-scale);
+  left: var(--track-left);
+}
 
 #image-track .img {
   width: 42vmin;
@@ -53,12 +65,16 @@ html {
   object-fit: cover;
   object-position: 100% center;
 }
+#image-track.mini .img {
+  width: 70vmin;
+  transition: all 1.8s ease-in-out;
+}
 
 #image-counter {
   color: aliceblue;
   font-size: larger;
   position: absolute;
-  bottom: 5vmin;
+  bottom: 5vh;
   left: 50%;
   transform: translateX(-50%);
   overflow: hidden;
@@ -68,4 +84,31 @@ html {
 #image-counter #counter {
   display: inline-flex;
   flex-direction: column;
+}
+
+#fullscreen-track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  user-select: none;
+}
+#fullscreen-track.deact {
+  pointer-events: none;
+}
+
+#fullscreen-track .img {
+  object-fit: cover;
+}
+
+@media (max-width: 760px) {
+  #image-counter {
+    display: none;
+  }
+
+  #image-track.mini.resize {
+    scale: var(--track-scale-sm);
+    left: var(--track-left-sm);
+  }
 }
