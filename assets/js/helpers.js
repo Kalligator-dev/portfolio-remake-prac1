@@ -21,9 +21,6 @@ window.addEventListener("resize", () => {
       easing: "cubic-bezier(0.66, 0.16, 0.63, 0.86)",
     }
   );
-});
-
-window.addEventListener("resize", () => {
   if (!fullscreenEl) return;
   minimizeTrack(fullscreenEl, 1200, true);
 });
