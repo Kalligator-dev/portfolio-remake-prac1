@@ -42,7 +42,8 @@ for (let i = 0; i < total; i++) {
 let currentPrc,
   rep = 0;
 let animationDone;
-let startLink;
+let startLinkTime;
+let startLinkLeft;
 const trackWidth = track.offsetWidth;
 function updateValue() {
   if (!fullscreenEl) {
@@ -259,7 +260,10 @@ const exitFullScreen = (duration = 600) => {
 };
 
 const minimizeFullscreenEl = (duration, easing) => {
-  startLink = Date.now();
+  startLinkTime = Date.now();
+  const elBox = fullscreenEl.getBoundingClientRect();
+  const midScreen = window.innerWidth / 2;
+  startLinkLeft = midScreen > elBox.left;
   const clone = fullscreenObject.el;
   const vmin = Math.min(window.innerHeight, window.innerWidth) / 100;
   clone.animate(
@@ -296,12 +300,11 @@ const linkPosition = (duration = 600, easing) => {
   const clone = fullscreenObject.el;
   const elBox = fullscreenEl.getBoundingClientRect();
   const elBox1 = clone.getBoundingClientRect();
-  const midScreen = window.innerWidth / 2;
   let centerDiff = (elBox1.width - elBox.width) / 2;
-  if (midScreen > elBox.left) centerDiff = 0;
+  if (startLinkLeft) centerDiff = 0;
   const styles = getComputedStyle(fullscreenEl);
   const styles1 = getComputedStyle(clone);
-  const animationTime = Math.max(5, duration + startLink - Date.now());
+  const animationTime = Math.max(5, duration + startLinkTime - Date.now());
 
   clone.animate(
     [
