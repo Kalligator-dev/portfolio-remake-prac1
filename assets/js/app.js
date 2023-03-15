@@ -17,6 +17,7 @@ let currentImage = 1;
 totalEl.innerText = total;
 
 let freeScroll = true;
+console.log("mobile");
 
 if (!freeScroll) {
   track.style.opacity = 0;
